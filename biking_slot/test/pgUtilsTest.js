@@ -29,5 +29,13 @@ describe('PGUtils', function(){
         ["something else-1-2"]
         );
     });
+    it('should include AND clause if required', function(){
+      var req = { 'query' : { 'status' : '1,2' } };
+      params= ["something else"];
+      assert.equal(
+        pg.buildInClause('status', req, 'query', params, 'alias', true),
+        "AND alias IN ($2, $3) "
+        );
+    })
   });
 });

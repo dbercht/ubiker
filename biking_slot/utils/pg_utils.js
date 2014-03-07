@@ -24,7 +24,7 @@ exports.rollback = function(client, done) {
   });
 };
 
-exports.buildInClause = function(key, req, paramType, params, alias) {
+exports.buildInClause = function(key, req, paramType, params, alias, includeAnd) {
   //Adding status/placement param if it exists
   if (key in req[paramType]) {
     var queryParams = req[paramType][key].split(",");
@@ -33,7 +33,7 @@ exports.buildInClause = function(key, req, paramType, params, alias) {
       params.push(queryParams[i]);
       vals.push("$" + params.length);
     }
-    return alias + " IN (" + vals.join(", ") + ") ";
+    return (includeAnd === true? "AND " : "") + alias + " IN (" + vals.join(", ") + ") ";
   } else {
     return "";
   }

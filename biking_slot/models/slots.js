@@ -69,12 +69,22 @@ var buildAllQuery = function(req) {
     "LEFT JOIN status s ON s.id = ps.status_id " +
     "LEFT JOIN placement p ON p.id = ps.placement_id " +
     "WHERE ps.latitude > $1 - $3 AND ps.latitude < $1 + $3 AND ps.longitude < $2 + $3 AND ps.longitude > $2 - $3 " +
-    "AND " + pgUtil.buildInClause('status', req, 'query', params, 's.name') +    
-    "AND " + pgUtil.buildInClause('placement', req,  'query', params, 'p.name') +   
+    pgUtil.buildInClause('status', req, 'query', params, 's.name', true) +    
+    pgUtil.buildInClause('placement', req,  'query', params, 'p.name', true) +   
      
+    "GROUP BY " +
+      "ps.id, "+ 
+      "location, " + 
+      "address, " + 
+      "spaces, " + 
+      "racks, " + 
+      "latitude, " + 
+      "longitude, " + 
+      "placement, " + 
+      "status, " +
+      "distance "+
     "ORDER BY distance ASC " +
     "LIMIT $4";
-
   return { 'query' : query, 'params' : params };
 };
 
