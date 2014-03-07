@@ -23,3 +23,18 @@ exports.rollback = function(client, done) {
     return done(err);
   });
 };
+
+exports.buildInClause = function(key, req, paramType, params, alias) {
+  //Adding status/placement param if it exists
+  if (key in req[paramType]) {
+    var queryParams = req[paramType][key].split(",");
+    var vals = [];
+    for (var i = 0; i < queryParams.length; i++) {
+      params.push(queryParams[i]);
+      vals.push("$" + params.length);
+    }
+    return "AND " + alias + " IN (" + vals.join(", ") + ") ";
+  } else {
+    return "";
+  }
+};

@@ -17,4 +17,5 @@ if (app.get('env') === 'development') {
 }
 
 app.get("/slots/:latitude;:longitude", slots.all);
-app.listen(app.get('port'));
+
+var server = app.listen(app.get('port'));

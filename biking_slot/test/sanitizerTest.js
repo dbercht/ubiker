@@ -25,6 +25,7 @@ describe('Sanitizer', function(){
     it('should return true when expected string is a string', function(){
       expect(sanitizer.isSanitized("ABC", sanitizer.STRING)).to.be.true;
       expect(sanitizer.isSanitized("abc", sanitizer.STRING)).to.be.true;
+      expect(sanitizer.isSanitized("abc_cba", sanitizer.STRING)).to.be.true;
     });
     it('should return true when expected string is not a string', function(){
       expect(sanitizer.isSanitized("12", sanitizer.STRING)).to.be.false;
@@ -34,6 +35,7 @@ describe('Sanitizer', function(){
     it('should return true when expected string array is a array', function(){
       expect(sanitizer.isSanitized("abc", sanitizer.STRING_ARRAY)).to.be.true;
       expect(sanitizer.isSanitized("abc,abc", sanitizer.STRING_ARRAY)).to.be.true;
+      expect(sanitizer.isSanitized("ab_c,abc", sanitizer.STRING_ARRAY)).to.be.true;
     });
     it('should return false when expected string array is not an array', function(){
       expect(sanitizer.isSanitized("abc342", sanitizer.STRING_ARRAY)).to.be.false;

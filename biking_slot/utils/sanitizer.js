@@ -30,9 +30,9 @@ exports.isSanitized = function(param, type) {
     case exports.FLOAT:
       return (/^(-)?\d+.\d+$/).test(param);
     case exports.STRING:
-      return (/^[a-zA-Z]+$/).test(param);
+      return (/^[a-zA-Z_]+$/).test(param);
     case exports.STRING_ARRAY:
-      return (/^[a-zA-Z]+(,[a-zA-Z]+)*$/).test(param);
+      return (/^[a-zA-Z_]+(,[a-zA-Z_]+)*$/).test(param);
     default:
       throw "Invalid param type";
   }
