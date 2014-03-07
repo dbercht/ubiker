@@ -10,7 +10,7 @@ describe('PGUtils', function(){
       params= [];
       assert.equal(
         pg.buildInClause('status', req, 'query', params, 'alias'),
-        "AND alias IN ($1) "
+        "alias IN ($1) "
         );
       assert.equal(
         params.join("-"),
@@ -22,7 +22,7 @@ describe('PGUtils', function(){
       params= ["something else"];
       assert.equal(
         pg.buildInClause('status', req, 'query', params, 'alias'),
-        "AND alias IN ($2, $3) "
+        "alias IN ($2, $3) "
         );
       assert.equal(
         params.join("-"),

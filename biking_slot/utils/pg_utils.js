@@ -33,7 +33,7 @@ exports.buildInClause = function(key, req, paramType, params, alias) {
       params.push(queryParams[i]);
       vals.push("$" + params.length);
     }
-    return "AND " + alias + " IN (" + vals.join(", ") + ") ";
+    return alias + " IN (" + vals.join(", ") + ") ";
   } else {
     return "";
   }
