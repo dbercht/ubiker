@@ -1,0 +1,1 @@
+NODE_ENV=development PORT=3000 nodemon ./server.js
