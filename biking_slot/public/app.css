@@ -1,0 +1,28 @@
+{
+  margin: 0px;
+}
+html, body{
+  position: relative;
+  height: 100%;
+}
+#header {
+  height: 5%;
+  z-index:10;
+  position:absolute;
+  top: 0;
+  left: 0;
+  background:#fff;
+}
+#directions-panel {
+  width:20%;
+  float:left;
+}
+#controls {
+  width:20%;
+  float:right;
+}
+#map_canvas {
+  float:left;
+  height:95%;
+  width:60%%;
+}

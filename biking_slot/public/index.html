@@ -1,1 +1,46 @@
-Hello
+<!doctype html>
+<html ng-app="ubarker">
+  <head>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="app.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <!--
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    -->
+  </head>
+  <body ng-controller="UbarkerCtrl">
+    <h2 id="header">Ubarker</h2>
+    <div id="controls">
+      <button ng-if="!loading" ng-click="getLocation()">Get Geo</button>
+      <p ng-if="loading" ng-click="getLocation()">Loading</p>
+      <p ng-if="!loading">{{  position | json}}</p>
+      <input type="number" ng-model="zoom">
+      <input type="number" ng-model="mockLat">
+      <input type="number" ng-model="mockLong">
+      {{ userPosition.lat() + ' ' + userPosition.lng() }}
+      <ul>
+        <li ng-repeat="marker in myMarkers" ng-if="marker.slot!==false" ng-click="setDestination(marker)">
+          {{ marker['slot'].location }}
+        </li>
+      </ul>
+    </div>
+
+    <div id="directions-panel"></div>
+    <div id="map_canvas" ui-map="myMap" ui-options="mapOptions" ui-event="{'map-idle' : 'onMapIdle()'}">
+    </div>
+    <div ng-repeat="marker in myMarkers" ui-map-marker="myMarkers[$index]['marker']" ui-event="{'map-click': 'markerClicked(marker)'}">
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular-resource.js"></script>
+    <script src="ui-map.js"></script>
+    <script src="ui-event.js"></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+    <script src="app.js"></script>
+
+    
+  </body>
+</html>
