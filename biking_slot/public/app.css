@@ -14,14 +14,20 @@ html, body{
   background:#fff;
 }
 #directions-panel {
+  height: 100%;
   width:20%;
   float:left;
+  padding: 3px;
+  overflow: scroll;
 }
 #controls {
+  height: 100%;
   width:20%;
   float:right;
+  overflow: scroll;
 }
 #map_canvas {
+  height: 100%;
   float:left;
   height:95%;
   width:60%%;

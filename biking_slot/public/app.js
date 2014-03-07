@@ -12,8 +12,8 @@ angular.module('ubarker', [
   $scope.loading = false;
   $scope.myMap = null;
   $scope.zoom = 13;
-  $scope.mockLat = 37.718951;
-  $scope.mockLong = -122.500339;
+  $scope.mockLat = 37.725951;
+  $scope.mockLong = -122.450339;
   $scope.userPosition = new google.maps.LatLng(37.7188951, -122.500339);
   $scope.selectedBikeSlot = null;
 
@@ -29,7 +29,7 @@ angular.module('ubarker', [
     mapTypeId: google.maps.MapTypeId.RODMAP
   }; 
 
-  $scope.getLocation = function() {
+  $scope.getLocation = function(keepDestination) {
     console.log("Getting lcoation");
     $scope.loading = true;
     $window.navigator.geolocation.getCurrentPosition(function(position) {
@@ -47,7 +47,7 @@ angular.module('ubarker', [
             var obj = {'marker' : new google.maps.Marker({ map: $scope.myMap, position: pos}),'slot': data[i]};
             $scope.myMarkers.push(obj);
             //Now select the closest one
-            if (i === 0 && $scope.selectedBikeSlot === null) {
+            if (i === 0 && keepDestination !== true) {
               $scope.setDestination(obj);
             }
           }
@@ -90,10 +90,6 @@ angular.module('ubarker', [
       });
       $scope.myMarkers = [$scope.userMarker, ];
     }
-  };
-
-  $scope.markerClicked = function(m) {
-    console.log("Clicked");
   };
 
   $scope.getLocation();

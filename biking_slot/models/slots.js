@@ -4,7 +4,7 @@ var inputSanitizer = require('../utils/sanitizer.js');
 var converter = require('../utils/converter.js');
 
 //Default radius in miles
-var DEFAULT_RADIUS = 5;
+var DEFAULT_RADIUS = 10;
 //Default results limit 
 var DEFAULT_LIMIT = 20;
 

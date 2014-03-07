@@ -13,34 +13,43 @@
   </head>
   <body ng-controller="UbarkerCtrl">
     <h2 id="header">Ubarker</h2>
+
     <div id="controls">
       <button ng-if="!loading" ng-click="getLocation()">Get Geo</button>
       <p ng-if="loading" ng-click="getLocation()">Loading</p>
       <p ng-if="!loading">{{  position | json}}</p>
       <input type="number" ng-model="zoom">
+      <input type="number" ng-model="searchRadius">
       <input type="number" ng-model="mockLat">
       <input type="number" ng-model="mockLong">
-      {{ userPosition.lat() + ' ' + userPosition.lng() }}
       <ul>
         <li ng-repeat="marker in myMarkers" ng-if="marker.slot!==false" ng-click="setDestination(marker)">
+          {{ marker['slot'].distance }} mi away <br />
           {{ marker['slot'].location }}
         </li>
       </ul>
     </div>
 
     <div id="directions-panel"></div>
-    <div id="map_canvas" ui-map="myMap" ui-options="mapOptions" ui-event="{'map-idle' : 'onMapIdle()'}">
-    </div>
-    <div ng-repeat="marker in myMarkers" ui-map-marker="myMarkers[$index]['marker']" ui-event="{'map-click': 'markerClicked(marker)'}">
-    </div>
 
+    <div id="map_canvas" ui-map="myMap" ui-options="mapOptions" ui-event="{'map-idle' : 'onMapIdle()'}"></div>
+
+    <div ng-repeat="marker in myMarkers" ui-map-marker="myMarkers[$index]['marker']" ui-event="{'map-click': 'setDestination(marker)'}"></div>
+
+    <!-- angular dependencies -->
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular-resource.js"></script>
+    <!-- maps -->
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+
+    <!-- bootstrap dependencies -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+
+    <!-- Custom files -->
     <script src="ui-map.js"></script>
     <script src="ui-event.js"></script>
-    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
     <script src="app.js"></script>
-
     
   </body>
 </html>
