@@ -3,6 +3,11 @@ var pgUtil = require('../utils/pg_utils.js');
 var inputSanitizer = require('../utils/sanitizer.js');
 var slots  = require('./slots.js');
 
+exports.CURRENT_INTERVAL_HOURS  = 12;
+
+/**
+ * Helper function to build the interval function
+ */
 var slotValidInterval = function(alias) {
   if (alias === undefined || alias === null) {
     alias = "";
@@ -10,7 +15,7 @@ var slotValidInterval = function(alias) {
     alias += ".";
   }
 
-  return "coalesce( " + alias + "date_requested, NOW()) + interval '12 hours' > NOW()";
+  return "coalesce( " + alias + "date_requested, NOW()) + interval '" + exports.CURRENT_INTERVAL_HOURS + " hours' > NOW()";
 };
 /**
  * Method for authenticated users to request a slot

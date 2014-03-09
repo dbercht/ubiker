@@ -1,4 +1,4 @@
-var sanitizer = require("../utils/sanitizer.js");
+var sanitizer = require("../../utils/sanitizer.js");
 var expect = require("chai").expect;
 var assert = require("assert");
 

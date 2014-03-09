@@ -11,10 +11,7 @@ exports.query = function(res, query, params, callback) {
         if (err) {
           if (res) {
             res.send(500);
-            return console.error('error running query', err);
           } else {
-            console.log("ERROR");
-            console.log(err);
             callback(undefined);
           }
         } else {

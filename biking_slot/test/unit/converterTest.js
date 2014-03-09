@@ -1,4 +1,4 @@
-var converter = require("../utils/converter.js");
+var converter = require("../../utils/converter.js");
 var assert = require("assert");
 
 describe('Converter', function(){

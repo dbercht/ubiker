@@ -1,5 +1,5 @@
 /* global require: false, it: false, describe: false */
-var Slot = require("../models/slots.js");
+var Slot = require("../../models/slots.js");
 var assert = require("assert");
 
 describe('Slot', function(){

@@ -1,6 +1,6 @@
 /* global require: false */
 
-var pg = require("../utils/pg_utils.js");
+var pg = require("../../utils/pg_utils.js");
 var assert = require("assert");
 
 describe('PGUtils', function(){

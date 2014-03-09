@@ -29,9 +29,12 @@ app.get("/slots/:latitude;:longitude", slots.all);
 app.post("/slots/:slot_id/ratings", auth.ensureAuthenticated, ratings.create);
 app.post("/slots/:slot_id/requests", auth.ensureAuthenticated, requests.create);
 
-app.get('/user', auth.ensureAuthenticated, function(req, res) { return res.send({user: req.user});});
-app.post('/user', users.create);
+app.post('/users', users.create);
+
+app.get('/login', auth.ensureAuthenticated, function(req, res) { return res.send({user: req.user});});
 app.post('/login', auth.authenticate(), auth.login);
-app.post('/logout', auth.authenticate(), auth.logout);
+app.del('/login', auth.ensureAuthenticated, auth.logout);
 
 app.listen(app.get('port'));
+
+exports.server = app;
