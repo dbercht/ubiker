@@ -35,7 +35,6 @@ exports.create = function(req, res) {
 
   var deleteQuery = "DELETE FROM request " + 
     "WHERE user_id = $1 " +  
-    "AND parking_slot_id = $2 " + 
     "AND " + slotValidInterval();
 
   var createQuery = 
@@ -45,7 +44,7 @@ exports.create = function(req, res) {
 
   pgUtil.query(res,
       deleteQuery,
-      params.slice(0,2),
+      params.slice(0,1),
       function(result) {
         pgUtil.query(res,
           createQuery,
@@ -55,4 +54,22 @@ exports.create = function(req, res) {
           });
       });
 };
+exports.getRequest = function(user_id, slot_id, done) {
+  var query = 'SELECT * ' + 
+    'FROM request ' + 
+    'WHERE user_id = $1 AND parking_slot_id = $2 AND ' + slotValidInterval() + 
+    'ORDER BY date_requested DESC';
+  pgUtil.query(null,
+      query,
+      [user_id, slot_id],
+      function(results) {
+        if (results.rows.length === 0) {
+          done(true);
+        } else {
+          done(null, results.rows[0]);
+        }
+      }
+      );
+};
+
 exports.slotValidInterval = slotValidInterval;

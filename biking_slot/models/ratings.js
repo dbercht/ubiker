@@ -44,3 +44,17 @@ exports.create = function(req, res) {
       });
 };
 
+exports.getRating = function(user_id, slot_id, done) {
+  var query = 'SELECT * from rating WHERE user_id = $1 AND parking_slot_id = $2';
+  pgUtil.query(null,
+      query,
+      [user_id, slot_id],
+      function(results) {
+        if (results.rows.length === 0) {
+          done(true);
+        } else {
+          done(null, results.rows[0]);
+        }
+      }
+      );
+};

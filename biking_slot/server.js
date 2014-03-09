@@ -15,7 +15,6 @@ app.set('port', process.env.PORT || 3000);
 app.use(express.cookieParser());
 app.use(express.bodyParser());
 app.use(express.session({ secret: 'uberuberuberuber'}));
-app.use(express.logger('dev'));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -35,6 +34,5 @@ app.get('/login', auth.ensureAuthenticated, function(req, res) { return res.send
 app.post('/login', auth.authenticate(), auth.login);
 app.del('/login', auth.ensureAuthenticated, auth.logout);
 
-app.listen(app.get('port'));
-
-exports.server = app;
+exports.runningServer = app.listen(app.get('port'));
+exports.app = app;
