@@ -65,6 +65,7 @@ var buildAllQuery = function(req) {
       "p.name as placement, " + 
       "s.name as status, " +
       "sqrt((ps.latitude - $1)^2+(ps.longitude - $2)^2) as distance "+
+      //"round( cast(sqrt((ps.latitude - $1)^2+(ps.longitude - $2)^2) as numeric), 3) as distance "+
     "FROM parking_slot ps " +
     "LEFT JOIN status s ON s.id = ps.status_id " +
     "LEFT JOIN placement p ON p.id = ps.placement_id " +

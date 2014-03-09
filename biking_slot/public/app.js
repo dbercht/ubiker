@@ -7,11 +7,23 @@ angular.module('ubarker', [
 .service('Slots', function($resource) {
   return $resource('/slots/:latitude;:longitude', {latitude:'@latitude', longitude: '@longitude'});
 })
-.controller('UbarkerCtrl', function($scope, Slots, $window) {
+.service('Config', function() {
+  var maps = {
+    //zoomControl: false,
+    streetViewControl: false,
+    panControl: false,
+    zoom: 10,
+    mapTypeId: google.maps.MapTypeId.RODMAP
+  };
+})
+.controller('UbarkerCtrl', function($scope, Slots, $window, Config) {
   $scope.slots = [];
+  $scope.search = {placement :[]};
   $scope.loading = false;
+  $scope.mapLoading = true;
   $scope.myMap = null;
   $scope.zoom = 13;
+
   $scope.mockLat = 37.725951;
   $scope.mockLong = -122.450339;
   $scope.userPosition = new google.maps.LatLng(37.7188951, -122.500339);
@@ -21,13 +33,7 @@ angular.module('ubarker', [
   var directionsService = new google.maps.DirectionsService();
   var directionsDisplay = new google.maps.DirectionsRenderer();
 
-  $scope.mapOptions = {
-    //zoomControl: false,
-    streetViewControl: false,
-    panControl: false,
-    zoom: $scope.zoom,
-    mapTypeId: google.maps.MapTypeId.RODMAP
-  }; 
+  $scope.mapOptions = Config.maps;
 
   $scope.getLocation = function(keepDestination) {
     console.log("Getting lcoation");
@@ -40,8 +46,22 @@ angular.module('ubarker', [
         if ($scope.userMarker !== undefined) {
           $scope.userMarker.setPosition($scope.userPosition);
         }
-        $scope.myMarkers = [{'marker' : $scope.userMarker, 'slot' : false} ];
-        $scope.slots = Slots.query({'latitude' : $scope.userPosition.lat(), 'longitude' : $scope.userPosition.lng()}, function(data) {
+        $scope.updateMarkers(keepDestination);
+        $scope.loading = false;
+      });
+    }, function(error) {
+      alert(error);
+    });
+  };
+  $scope.updateMarkers = function(keepDestination) {
+    for (var i = 1; i < $scope.myMarkers.length; i++) {
+      $scope.myMarkers[i].marker.setMap(null);
+    }
+    $scope.myMarkers = [];
+    $scope.myMarkers.push({'marker' : $scope.userMarker, 'slot' : false});
+    $scope.slots = Slots.query(
+        {'latitude' : $scope.userPosition.lat(), 'longitude' : $scope.userPosition.lng(), 'placement' : $scope.search.placement.join(",")}, 
+        function(data) {
           for(var i = 0; i < data.length; i++) {
             var pos = new google.maps.LatLng(data[i].latitude, data[i].longitude);
             var obj = {'marker' : new google.maps.Marker({ map: $scope.myMap, position: pos}),'slot': data[i]};
@@ -52,11 +72,6 @@ angular.module('ubarker', [
             }
           }
         });
-        $scope.loading = false;
-      });
-    }, function(error) {
-      alert(error);
-    });
   };
 
   $scope.$watch('zoom', function() {
@@ -76,21 +91,30 @@ angular.module('ubarker', [
         directionsDisplay.setDirections(response);
       }
     });
-  }//;
+  };
 
   //Markers should be added after map is loaded
+  var instantiated = false;
   $scope.onMapIdle = function() {
-    if ($scope.myMarkers === undefined){
+    if (!instantiated) {
+      $scope.getLocation();
+      $scope.mapLoaded = true;
+      instantiated = true;
       directionsDisplay.setMap($scope.myMap);
       directionsDisplay.setPanel(document.getElementById("directions-panel"));
       biciclyingLayer.setMap($scope.myMap);
+    }
+    if ($scope.myMarkers === undefined){
       $scope.userMarker = new google.maps.Marker({
         map: $scope.myMap,
-        position: $scope.userPosition 
+        position: $scope.userPosition ,
+        title: "This is you"
       });
       $scope.myMarkers = [$scope.userMarker, ];
     }
   };
-
-  $scope.getLocation();
+  $scope.repeat = function(n) { 
+    if (n == 0) return null;
+    return new Array(n);
+  };
 });

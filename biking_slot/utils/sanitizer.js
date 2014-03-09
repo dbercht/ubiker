@@ -11,8 +11,12 @@ exports.sanitizeReq = function(params, inputs, errors) {
   for (var param in params) {
     if (params.hasOwnProperty(param)) {
       if ((param in inputs) && !exports.isSanitized(params[param], inputs[param])) {
-        errors.message[param] = {"expected" : inputs[param], "received" : params[param]};
-        errors.size++;
+        if (params[param] === "") {
+          delete params[param]; 
+        } else {
+          errors.message[param] = {"expected" : inputs[param], "received" : params[param]};
+          errors.size++;
+        }
       }
     }
   }

@@ -12,30 +12,75 @@
     -->
   </head>
   <body ng-controller="UbarkerCtrl">
-    <h2 id="header">Ubarker</h2>
+    <div id="header"><h2>Ub<span class="darker">ik</span>er</h2></div>
 
     <div id="controls">
-      <button ng-if="!loading" ng-click="getLocation()">Get Geo</button>
-      <p ng-if="loading" ng-click="getLocation()">Loading</p>
-      <p ng-if="!loading">{{  position | json}}</p>
-      <input type="number" ng-model="zoom">
-      <input type="number" ng-model="searchRadius">
-      <input type="number" ng-model="mockLat">
-      <input type="number" ng-model="mockLong">
-      <ul>
-        <li ng-repeat="marker in myMarkers" ng-if="marker.slot!==false" ng-click="setDestination(marker)">
-          {{ marker['slot'].distance }} mi away <br />
-          {{ marker['slot'].location }}
-        </li>
-      </ul>
+      <form role="form">
+        <div class="form-group">
+          <label for="Slot Type">Placement Types</label>
+          <select multiple class="form-control" ng-model="search.placement" placeholder="Slot Type">
+            <option value="PARCEL">Parcel</option>
+            <option value="SIDEWALK">Sidewalk</option>
+            <option value="PARKING_LANE">Parking Lane</option>
+            <option value="GARAGE">Garage</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-md btn-block" ng-click="updateMarkers(false)">Search</button>
+      </form>
+      <div class="panel panel-default">
+        <div class="panel-body" ng-if="myMarkers.length>1">
+          Displaying {{ myMarkers.length - 1}} parking slots  near you
+        </div>
+      </div>
+      <a ng-if="loading" class="list-group-item">
+        Finding parking slots near you
+      </a>
+    <!-- Button trigger modal -->
+      <div class="list-group" ng-if="myMarkers.length>1">
+        <a class="list-group-item {{ marker == selectedBikeSlot ? 'active' : '' }}" ng-repeat="marker in myMarkers" ng-if="marker.slot!==false" ng-click="setDestination(marker)">
+          <h5 class="list-group-item-heading">
+            {{ marker['slot'].location }}
+          </h5>
+          <span class="badge">{{marker['slot'].spaces}}</span>
+          <!--<p class="list-group-item-text">{{ marker['slot'].distance | number:2 }} mi away </p>-->
+          <p class="list-group-item-text">{{ marker['slot'].racks }} racks</p>
+          <p class="list-group-item-text">Placement type: {{ marker['slot'].placement }}</p>
+          <p class="list-group-item-text">Status: <span class="glyphicon glyphicon-{{ marker['slot'].status === 'COMPLETE' ? 'ok' : 'warning-sign' }}"></span></p>
+          <p class="list-group-item-text" ng-if="marker['slot'].stars > 0 "><span ng-repeat="star in repeat(marker['slot'].stars) track by $index" class="glyphicon glyphicon-star"></span></p>
+          <button  class="btn btn-primary btn-md btn-block" data-toggle="modal" data-target="#myModal">
+          Reserve a slot 
+        </button>
+        </a>
+      </div>
     </div>
 
-    <div id="directions-panel"></div>
+    <div id="directions">
+      <h2>Directions</h2>
+      <div id="directions-panel"></div>
+    </div>
 
     <div id="map_canvas" ui-map="myMap" ui-options="mapOptions" ui-event="{'map-idle' : 'onMapIdle()'}"></div>
 
     <div ng-repeat="marker in myMarkers" ui-map-marker="myMarkers[$index]['marker']" ui-event="{'map-click': 'setDestination(marker)'}"></div>
 
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+          </div>
+          <div class="modal-body">
+            ...
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- angular dependencies -->
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular-resource.js"></script>
@@ -44,12 +89,12 @@
 
     <!-- bootstrap dependencies -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 
     <!-- Custom files -->
     <script src="ui-map.js"></script>
     <script src="ui-event.js"></script>
     <script src="app.js"></script>
-    
+
   </body>
 </html>
