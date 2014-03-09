@@ -10,7 +10,7 @@ var app = app.server;
 describe('User Query', function() {
   before(function(done) {
     testHelper.resetData(function() {
-      testHelper.createTestUser(1, done);
+      testHelper.createTestUser(0, done);
     });
   });
   describe('#findById()', function() {
@@ -27,11 +27,11 @@ describe('User Query', function() {
   });
   describe('#findByEmail()', function() {
     it('should find by email', function(done) {
-      var user = User.findByEmail(testHelper.users[1][1], function(err, user) {
+      var user = User.findByEmail(testHelper.users[0].email, function(err, user) {
         if (user) {
-          assert.equal(user.email, testHelper.users[1][1], "Email " + user.email + " not equal to " + testHelper.users[1][1]);
+          assert.equal(user.email, testHelper.users[0].email, "Email " + user.email + " not equal to " + testHelper.users[0].email);
         }  else {
-          assert.fail(null, testHelper.users[1][1], "User not found");
+          assert.fail(null, testHelper.users[0].email, "User not found");
         }
         done();
       }); 

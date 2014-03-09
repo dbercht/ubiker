@@ -1,4 +1,4 @@
-/* global require: false, describe: false, before: false, after: false, it:false */
+/* global require: false, describe: false, before: false, it:false */
 var assert = require("assert"),
     request = require('supertest'),
     testHelper = require('../helper.js'),
@@ -11,7 +11,7 @@ var app = app.server;
 describe('Auth Query', function() {
   before(function(done) {
     testHelper.resetData(function() {
-      testHelper.createTestUser(1, done);
+      testHelper.createTestUser(0, done);
     });
   });
   describe('#serializeUser()', function() {
@@ -26,7 +26,7 @@ describe('Auth Query', function() {
   describe('#deserializeUser()', function() {
     it('should deserialize user from id', function(done) {
       passport.deserializeUser(1, function(err, user) {
-        assert.equal(user.username, testHelper.users[1][0]);
+        assert.equal(user.username, testHelper.users[0].username);
         done();
       });
     });
@@ -41,7 +41,7 @@ describe('Auth Query', function() {
 describe("Auth routes", function() {
   before(function(done) {
     testHelper.resetData(function() {
-      testHelper.createTestUser(1, done);
+      testHelper.createTestUser(0, done);
     });
   });
   describe('#ensureAuthenticated()', function(){
@@ -71,7 +71,7 @@ describe("Auth routes", function() {
       request(app)
       .post('/login')
       .send({
-        email : testHelper.users[1][1]
+        email : testHelper.users[0].email
       })
       .expect(400, done);
     });
@@ -79,7 +79,7 @@ describe("Auth routes", function() {
       request(app)
       .post('/login')
       .send({
-        password : testHelper.users[1][2]
+        password : testHelper.users[0].password
       })
       .expect(400, done);
     });
@@ -87,7 +87,7 @@ describe("Auth routes", function() {
       request(app)
       .post('/login')
       .send({
-        email : testHelper.users[1][1],
+        email : testHelper.users[0].email,
         password : 'wrong'
       })
       .expect(401, done);
@@ -96,7 +96,7 @@ describe("Auth routes", function() {
       request(app)
       .post('/login')
       .send({
-        email : "NOP",
+        email : "non-existing",
         password : 'wrong'
       })
       .expect(500, done);
@@ -105,8 +105,8 @@ describe("Auth routes", function() {
       request(app)
       .post('/login')
       .send({
-        email : testHelper.users[1][1],
-        password : testHelper.users[1][2],
+        email : testHelper.users[0].email,
+        password : testHelper.users[0].password,
       })
       .expect(200, done);
     });
@@ -116,7 +116,7 @@ describe("Auth routes", function() {
     before(function(done) {
       testHelper.getUserLoginCookie(
         app,
-        1,
+        0,
         function (c) { cookie = c },
         done
         );

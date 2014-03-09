@@ -14,7 +14,7 @@ passport.use(new LocalStrategy(
     process.nextTick(function () {
       users.findByEmail(email, function(err, user) {
         if (err) { return done(err); }
-        if (!user || user.password != password) { console.log(user);return done(null, false, {}); }
+        if (!user || user.password != password) { return done(null, false, {}); }
         delete user.password;
         return done(null, user);
       });
