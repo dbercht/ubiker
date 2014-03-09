@@ -4,8 +4,12 @@ exports.STRING = "STRING";
 exports.STRING_ARRAY = "STRING_ARRAY";
 exports.FLOAT = "FLOAT";
 
+/**
+ * Sanitizes a dictionary of parameters and sanititzes each according 
+ * to its expected input type, as defined by the inputs dict
+ */
 exports.sanitizeReq = function(params, inputs, errors) {
-  if (!errors) {
+  if (errors === null || errors === undefined) {
     errors = { 'size' : 0, 'message' : {}};
   }
   for (var param in params) {
@@ -26,6 +30,10 @@ exports.sanitizeReq = function(params, inputs, errors) {
     return errors;
   }
 };
+
+/**
+ * Verify if a value is sanitized to the appropriate type
+ */
 exports.isSanitized = function(param, type) {
   if (param === "") return false;
   switch (type) {

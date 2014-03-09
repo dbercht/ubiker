@@ -9,8 +9,14 @@ exports.query = function(res, query, params, callback) {
     client.query (query,  params, function(err, result) {
         done();
         if (err) {
-          res.send(500);
-          return console.error('error running query', err);
+          if (res) {
+            res.send(500);
+            return console.error('error running query', err);
+          } else {
+            console.log("ERROR");
+            console.log(err);
+            callback(undefined);
+          }
         } else {
           callback(result);
         }

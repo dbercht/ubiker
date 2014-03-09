@@ -20,6 +20,7 @@ describe('Sanitizer', function(){
       expect(sanitizer.isSanitized("3 3", sanitizer.INT)).to.be.false;
       expect(sanitizer.isSanitized("abc", sanitizer.INT)).to.be.false;
       expect(sanitizer.isSanitized("-3", sanitizer.INT)).to.be.false;
+      expect(sanitizer.isSanitized("3.3", sanitizer.INT)).to.be.false;
       expect(sanitizer.isSanitized("", sanitizer.INT)).to.be.false;
     });
     it('should return true when expected string is a string', function(){
