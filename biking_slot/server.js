@@ -2,13 +2,22 @@
 
 var express = require('express'),
     path = require('path'),
-    slots = require('./models/slots.js');
+    passport = require('passport'),
+    slots = require('./models/slots.js'),
+    requests = require('./models/requests.js'),
+    ratings = require('./models/ratings.js'),
+    users = require('./models/users.js'),
+    auth = require('./models/auth.js');
 
 var app = express();
 
 app.set('port', process.env.PORT || 3000);
+app.use(express.cookieParser());
 app.use(express.bodyParser());
+app.use(express.session({ secret: 'uberuberuberuber'}));
 app.use(express.logger('dev'));
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(express.static(path.join(__dirname, 'public')));
 
 //Adding error handler to dev environment to ease debugging
@@ -17,5 +26,12 @@ if (app.get('env') === 'development') {
 }
 
 app.get("/slots/:latitude;:longitude", slots.all);
+app.post("/slots/:slot_id/ratings", auth.ensureAuthenticated, ratings.create);
+app.post("/slots/:slot_id/requests", auth.ensureAuthenticated, requests.create);
 
-var server = app.listen(app.get('port'));
+app.get('/user', auth.ensureAuthenticated, function(req, res) { return res.send({user: req.user});});
+app.post('/user', users.create);
+app.post('/login', auth.authenticate(), auth.login);
+app.post('/logout', auth.authenticate(), auth.logout);
+
+app.listen(app.get('port'));

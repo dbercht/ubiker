@@ -2,6 +2,7 @@
 var pgUtil = require('../utils/pg_utils.js');
 var inputSanitizer = require('../utils/sanitizer.js');
 var converter = require('../utils/converter.js');
+var requests = require('./requests.js');
 
 //Default radius in miles
 var DEFAULT_RADIUS = 10;
@@ -15,6 +16,7 @@ var inputs = {
   "placement" : inputSanitizer.STRING_ARRAY,
   "latitude" : inputSanitizer.FLOAT,
   "longitude" : inputSanitizer.FLOAT,
+  "rating" : inputSanitizer.INT,
 };
 
 /**
@@ -41,6 +43,7 @@ exports.all = function(req, res) {
   }
 };
 
+
 /**
  * buildAllQuery - Build query for the 'all' functionality of slots
  */
@@ -54,6 +57,7 @@ var buildAllQuery = function(req) {
       converter.milesToDegrees(radius),
       limit
         ];
+
   var query = "SELECT " +
       "ps.id, "+ 
       "ps.location_name as location, " + 
@@ -64,12 +68,17 @@ var buildAllQuery = function(req) {
       "ps.longitude, " + 
       "p.name as placement, " + 
       "s.name as status, " +
-      "sqrt((ps.latitude - $1)^2+(ps.longitude - $2)^2) as distance "+
-      //"round( cast(sqrt((ps.latitude - $1)^2+(ps.longitude - $2)^2) as numeric), 3) as distance "+
+      "sqrt((ps.latitude - $1)^2+(ps.longitude - $2)^2) as distance, " +
+      "AVG(average_rating.val) as rating, " +
+      "COUNT(req) as pending_requests " +
+
     "FROM parking_slot ps " +
     "LEFT JOIN status s ON s.id = ps.status_id " +
     "LEFT JOIN placement p ON p.id = ps.placement_id " +
+    "LEFT JOIN rating average_rating ON average_rating.parking_slot_id = ps.id " +
+    "LEFT JOIN request req ON req.parking_slot_id = ps.id " +
     "WHERE ps.latitude > $1 - $3 AND ps.latitude < $1 + $3 AND ps.longitude < $2 + $3 AND ps.longitude > $2 - $3 " +
+    "AND " + requests.slotValidInterval("req") + " " +
     pgUtil.buildInClause('status', req, 'query', params, 's.name', true) +    
     pgUtil.buildInClause('placement', req,  'query', params, 'p.name', true) +   
      
@@ -90,3 +99,4 @@ var buildAllQuery = function(req) {
 };
 
 exports.buildAllQuery = buildAllQuery;
+exports.inputs = inputs;
