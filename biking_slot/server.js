@@ -34,5 +34,6 @@ app.get('/login', auth.ensureAuthenticated, function(req, res) { return res.send
 app.post('/login', auth.authenticate(), auth.login);
 app.del('/login', auth.ensureAuthenticated, auth.logout);
 
-exports.runningServer = app.listen(app.get('port'));
+app.listen(app.get('port'));
+
 exports.app = app;

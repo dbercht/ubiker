@@ -9,6 +9,17 @@ html, body{
   height: 5%;
   background:#000;
 }
+#header h2 {
+  float:left;
+  letter-spacing: 10px;
+  text-align: center;
+  color: #777;
+  width: 65%;
+}
+#header .user {
+  float:left;
+  width: 20%;
+}
 #directions{
   height: 95%;
   width:20%;
@@ -31,5 +42,5 @@ html, body{
   width:60%%;
 }
 .darker {
-  color: #191919;
+  color: #292929;
   }

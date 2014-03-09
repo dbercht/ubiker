@@ -1,5 +1,5 @@
 <!doctype html>
-<html ng-app="ubarker">
+<html ng-app="ubiker">
   <head>
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
@@ -11,8 +11,13 @@
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
     -->
   </head>
-  <body ng-controller="UbarkerCtrl">
-    <div id="header"><h2>Ub<span class="darker">ik</span>er</h2></div>
+  <body ng-controller="UbikerCtrl">
+    <div id="header">
+      <span ng-if="isLoggedIn" class="user">Welcome, User</span>
+      <button  ng-if="!isLoggedIn"  class="user btn btn-primary btn-md btn-block" data-toggle="modal" data-target="#logInModal">Log In</button>
+      <h2>UB<span class="darker">ik</span>ER</h2>
+    </div>
+    <div class="clearfix"></div>
 
     <div id="controls">
       <form role="form">
@@ -32,9 +37,13 @@
           Displaying {{ myMarkers.length - 1}} parking slots  near you
         </div>
       </div>
-      <a ng-if="loading" class="list-group-item">
+      <div ng-if="loading" class="list-group-item">
         Finding parking slots near you
-      </a>
+        <div class="progress progress-striped active">
+          <div class="progress-bar"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+          </div>
+        </div>
+      </div>
     <!-- Button trigger modal -->
       <div class="list-group" ng-if="myMarkers.length>1">
         <a class="list-group-item {{ marker == selectedBikeSlot ? 'active' : '' }}" ng-repeat="marker in myMarkers" ng-if="marker.slot!==false" ng-click="setDestination(marker)">
@@ -46,7 +55,7 @@
           <p class="list-group-item-text">{{ marker['slot'].racks }} racks</p>
           <p class="list-group-item-text">Placement type: {{ marker['slot'].placement }}</p>
           <p class="list-group-item-text">Status: <span class="glyphicon glyphicon-{{ marker['slot'].status === 'COMPLETE' ? 'ok' : 'warning-sign' }}"></span></p>
-          <p class="list-group-item-text" ng-if="marker['slot'].stars > 0 "><span ng-repeat="star in repeat(marker['slot'].stars) track by $index" class="glyphicon glyphicon-star"></span></p>
+          <p class="list-group-item-text" ng-if="marker['slot'].stars > 0 "><span ng-repeat="star in repeat(marker['slot'].rating) track by $index" class="glyphicon glyphicon-star"></span></p>
           <button  class="btn btn-primary btn-md btn-block" data-toggle="modal" data-target="#myModal">
           Reserve a slot 
         </button>
@@ -62,6 +71,53 @@
     <div id="map_canvas" ui-map="myMap" ui-options="mapOptions" ui-event="{'map-idle' : 'onMapIdle()'}"></div>
 
     <div ng-repeat="marker in myMarkers" ui-map-marker="myMarkers[$index]['marker']" ui-event="{'map-click': 'setDestination(marker)'}"></div>
+
+    <!-- Modal -->
+    <div class="modal fade" ng-controller="UserCtrl"id="logInModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title" id="myModalLabel">Log In</h4>
+          </div>
+          <div class="modal-body">
+            <div ng-if="badLogin === false">
+              Wrong or inexisting username/combo, try again.
+            </div>
+            <form role="form" class="col-sm-6 well">
+              <h3 class="text-center">Login/Sign Up</h3>
+              <div class="form-group">
+                <label for="email">Email address</label>
+                <input ng-model="user.email" type="email" class="form-control" id="email" placeholder="Email">
+              </div>
+              <div class="form-group">
+                <label for="password">Password</label>
+                <input ng-model="user.password" type="password" class="form-control" id="password" placeholder="Password">
+              </div>
+              <button type="button" class="btn btn-primary" ng-click="login()">Log In</button>
+            </form> 
+            <form role="form" class="col-sm-6 well">
+            <h3 class="text-center">Sign Up</h3>
+              <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" class="form-control" id="username" placeholder="Username">
+              </div>
+              <div class="form-group">
+                <label for="email">Email address</label>
+                <input type="email" class="form-control" id="email" placeholder="Email">
+              </div>
+              <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="password" placeholder="Password">
+              </div>
+              <button type="button" class="btn btn-primary">Sign Up</button>
+            </form> 
+          </div>
+          <div class="modal-footer">
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Modal -->
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">

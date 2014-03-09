@@ -1,5 +1,5 @@
 /* global angular: false, google: false, console: false, alert: false, window:false */
-angular.module('ubarker', [
+angular.module('ubiker', [
     'ui.map',
     'ui.event',
     'ngResource'
@@ -16,7 +16,54 @@ angular.module('ubarker', [
     mapTypeId: google.maps.MapTypeId.RODMAP
   };
 })
-.controller('UbarkerCtrl', function($scope, Slots, $window, Config) {
+.service('User', function($http) {
+  var loggedIn = false;
+  var user = {};
+  return {
+    isLoggedIn : function() {
+                    $http({method : 'GET', url : '/login'}).
+                      success(function(data, status, headers, config){
+                        loggedIn = true;
+                        user = data.user;
+                      }).
+                      error(function(data, status, headers, config) {
+                        loggedIn = false;
+                        user = {};
+                      });
+                   return loggedIn;
+                 },
+    login : function(email, password) {
+                    $http({method : 'POST', url : '/login', data: { email : email, password : password}}).
+                      success(function(data, status, headers, config){
+                        loggedIn = true;
+                        user = data.user;
+                        return {
+                          user : user,
+                          isLoggedIn : true,
+                          errors : false
+                        };
+                      }).
+                      error(function(data, status, headers, config) {
+                        return {
+                          user : {},
+                          isLoggedIn : false,
+                          error: "Bad or inexisting combination"
+                        };
+                      });
+                   return loggedIn;
+                 }
+    };
+})
+.controller('UserCtrl', function($scope, User) {
+  $scope.isLoggedIn = User.isLoggedIn();
+  $scope.user = {email: "", password : ""};
+  $scope.login = function() {
+    console.log("Logging in");
+    $scope.badLogin = User.login($scope.user.email, $scope.user.password);
+  }
+  console.log(User.user);
+})
+.controller('UbikerCtrl', function($scope, Slots, $window, Config) {
   $scope.slots = [];
   $scope.search = {placement :[]};
   $scope.loading = false;
