@@ -235,7 +235,6 @@ angular.module('ubiker', [
     $window.navigator.geolocation.getCurrentPosition(function(position) {
       $scope.$apply(function() {
         //$scope.userPosition = new google.maps.LatLng($scope.mockLat, $scope.mockLong);
-        console.log(position.coords);
         $scope.userPosition = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
         $scope.myMap.panTo($scope.userPosition);
         if ($scope.userMarker !== undefined) {

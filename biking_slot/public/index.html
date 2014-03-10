@@ -47,8 +47,11 @@
           </div>
         </div>
       </div>
+      <div ng-if="!loading&&myMarkers.length <= 1">
+        Sorry, we didn't find anything in your area
+      </div>
     <!-- Button trigger modal -->
-      <div class="list-group" ng-if="myMarkers.length>1">
+      <div class="list-group" ng-if="myMarkers.length>0">
         <a class="list-group-item {{ marker == selectedBikeSlot ? 'active' : '' }}" ng-repeat="marker in myMarkers" ng-if="marker.slot!==false" ng-click="setDestination(marker)">
           <h5 class="list-group-item-heading">
             {{ marker['slot'].location }}
@@ -66,7 +69,7 @@
       </div>
     </div>
 
-    <div id="directions">
+    <div id="directions" >
       <h2>Directions</h2>
       <div id="directions-panel"></div>
     </div>
