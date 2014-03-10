@@ -21,6 +21,75 @@
 * On Sunny days and during cycling events in a city, there are ***'surge parking slot'*** status making cyclists pay for slots to keep the market with enough slots for everyone (just kidding).
 * Users can select what type of parking spot to choose (Sidewalk, Garage, Racks, Parcel)
 
+## API
+
+#### GET /slots/{latitude};{longitutde}(?limit={limit}&radius={radius}&status{status}&placement={placement}
+##### Params
+* latitude: Float
+* longitude: Float
+##### Query
+* limit: Int
+* radius: Int -> Geometric mile radius of latitude/longitude
+* status: ArrayString -> Status(es) of the parking slots, delimited by a comma. e.g. ACTIVE,INPROGRESS 
+* placement: ArrayString -> Placement(s) of the parking slots, delimited by a comma. e.g. PARKING,SIDEWALK
+i
+##### Return
+* 200 If quer/params valid
+* 400 If query/params not valid
+
+{ id, location, address, spaces, racks, latitude, longitude, placement, status, distance, rating, num _ ratings, pending _ requests, total _ requests }
+
+If the user is loggedin, also return:
+{ user _ rating, user _ requested
+#### GET /login
+##### Return
+* 200 If user is logged in
+* 401 If User is not logged in
+
+{ user: { username, email }}
+
+#### POST /login
+##### Body Params
+* email: String
+* password: String
+
+##### Return
+* 400 If bad/nonexisting combination
+* 200 If success (returns GET /login)
+
+#### POST /users
+##### Body Params
+* email : String
+* username : String
+* password : String
+
+##### Return
+* 201 If Created
+* 400 If bad params
+* 500 If email exists (A little hacky)
+
+{}
+
+#### POST /slots/{id}/ratings
+##### Params
+* id: Int
+
+##### Body Params
+* rating :Int [1 - 5]
+
+##### Return
+* 401 If User not authorized
+* 201 If Created
+
+
+#### POST /slots/{id}/requests
+##### Params
+* id: Int
+
+##### Return
+* 401 If User not authorized
+* 201 If Created
+
 ## Tools
 
 ### Backend: Node.js
@@ -28,8 +97,9 @@
   I am no Node ninja, but I've dabbled with Node before to develop prototypes of personal projects.
   If I had more time, I'd develop a backend on a language that lives on the JVM (like Scala) because of the predictability of the JVM.
   Node makes it easy to spin up prototypes, and for a full-stack track, it makes sense to keep a consistent language in the frontend/backend.
+  I did not use an MVC pattern on the backend to avoid ORMs for the initial simplicity of the application.
 
-### Frontend: AngularJS
+### Frontend: AngularJS/Bootstrap
 
   Although the recommendation was not to use Angular, I decided to use it simply because I am not a front-end developer and Angular is the only tool for front-end I am comfortable with. But I still apologize for the monolothic code :/. It truly makes developing SPA easy, but I'm sure some strict front-end devs have a better opinion on its pros and cons. I've also developed prototypes on Angular or projects spun off from Angular such as [Ionic Framework](www.ionicframework.com).
 
@@ -45,8 +115,8 @@
 ### Testing: mocha
 
   The backend is tested using mocha.
-  The frontend does not contain any tests.
   To continuously run the backend code, simply run ```npm test``` to continuously watch your backend code for changes.
+  The frontend does not contain any tests.
 
 ### Auth: Passport
 
