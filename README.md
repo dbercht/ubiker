@@ -14,10 +14,10 @@
 ##Features
 
 * User Registration
-* Find closes parking slots (multiple), but default to closest one
+* Find closest parking slots (multiple), but default to closest one
 * Users are able to rate parking slots
 * Users are able to 'request' a parking slot. This means that a user can tell the system he will most likely be trying to park there. This allows the other users to have a general sense of how crowded the parking slot will be. A user can only have a SINGLE active request per parking slot. An active slot is any request made in the last 12 hours. Users can easily override their current request.
-* On Sunny days and during cycling events in a city, there are 'surge parking slot' status making cyclists pay for slots to keep the market with enough slots for everyone (just kidding).
+* On Sunny days and during cycling events in a city, there are ***'surge parking slot'*** status making cyclists pay for slots to keep the market with enough slots for everyone (just kidding).
 * Users can select what type of parking spot to choose (Sidewalk, Garage, Racks, Parcel)
 
 ## Tools
