@@ -14,7 +14,7 @@
   <body ng-controller="UbikerCtrl">
     <div id="header" ng-controller="AuthCtrl">
       <span ng-if="currentUser.isLoggedIn" class="user">
-        <button ng-if="currentUser.isLoggedIn"  class="col-sm-4 btn btn-primary btn-md btn-block" ng-click="logout()">Log Out</button>
+        <button ng-if="currentUser.isLoggedIn"  class="col-sm-4 btn btn-primary btn-md btn-block" ng-click="logout()">{{ currentUser.user.username }}, Log Out?</button>
       </span>
       <button  ng-if="!currentUser.isLoggedIn"  class="user btn btn-primary btn-md btn-block" data-toggle="modal" data-target="#logInModal">Log In</button>
       <h2>UB<span class="darker">ik</span>ER</h2>
@@ -191,16 +191,14 @@
                 <button ng-if="!currentUser.isLoggedIn" class="btn btn-lg btn-block btn-warning" data-toggle="modal" data-target="#logInModal" data-dismiss="modal">Login or signup to rate!</button>
 
                 <div ng-if="currentUser.isLoggedIn&&(ratedSlots[selectedBikeSlot['slot'].id]!==true)" class="btn-group">
-                  <button type="button" class"btn btn-default"  ng-click="rateSlot(selectedBikeSlot['slot'], 0)">0 (Bad)</button>
-                  <button type="button" class"btn btn-default"  ng-click="rateSlot(selectedBikeSlot['slot'], 1)">1</button>
-                  <button type="button" class"btn btn-default"  ng-click="rateSlot(selectedBikeSlot['slot'], 2)">2</button>
-                  <button type="button" class"btn btn-default"  ng-click="rateSlot(selectedBikeSlot['slot'], 3)">3</button>
-                  <button type="button" class"btn btn-default"  ng-click="rateSlot(selectedBikeSlot['slot'], 4)">4</button>
-                  <button type="button" class"btn btn-default"  ng-click="rateSlot(selectedBikeSlot['slot'], 5)">5 (Great)</button>
+                  <button type="button" class="btn btn-default"  ng-click="rateSlot(selectedBikeSlot['slot'], 0)">0 (Bad)</button>
+                  <button type="button" class="btn btn-default"  ng-click="rateSlot(selectedBikeSlot['slot'], 1)">1</button>
+                  <button type="button" class="btn btn-default"  ng-click="rateSlot(selectedBikeSlot['slot'], 2)">2</button>
+                  <button type="button" class="btn btn-default"  ng-click="rateSlot(selectedBikeSlot['slot'], 3)">3</button>
+                  <button type="button" class="btn btn-default"  ng-click="rateSlot(selectedBikeSlot['slot'], 4)">4</button>
+                  <button type="button" class="btn btn-default"  ng-click="rateSlot(selectedBikeSlot['slot'], 5)">5 (Great)</button>
                 </div>
               </a>
-              {{ ratedSlots }}
-              {{ currentSlotRequested }}
             </div>
           </div>
           <div class="modal-footer">

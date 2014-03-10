@@ -70,9 +70,9 @@ var buildAllQuery = function(req) {
       "s.name as status, " +
       "sqrt((ps.latitude - $1)^2+(ps.longitude - $2)^2) as distance, " +
       "AVG(average_rating.val) as rating, " +
-      "COUNT(average_rating) as num_ratings, " +
-      "COUNT(req) as pending_requests, " +
-      "COUNT(total_requests) as total_requests " +
+      "COALESCE(COUNT(average_rating), 0) as num_ratings, " +
+      "COALESCE(COUNT(req), 0) as pending_requests, " +
+      "COALESCE(COUNT(total_requests), 0) as total_requests " +
 
     "FROM parking_slot ps " +
     "LEFT JOIN status s ON s.id = ps.status_id " +

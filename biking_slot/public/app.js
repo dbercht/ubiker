@@ -98,15 +98,12 @@ angular.module('ubiker', [
 
   $scope.signup = function() {
     User.save($scope.signupInfo, function(response) {
-      if (response.status < 300) {
-        $scope.login($scope.signupInfo);
-      } else {
-        Auth.currentUser.error = "Please verify your inputs.";
-      }
-
+      Auth.currentUser.error = false;
+      $scope.login($scope.signupInfo);
     }, function(response) {
       console.log(response);
       if (response.status === 400) {
+        console.log("WHY ARE YOU HERE");
         Auth.currentUser.error = "Please verify your inputs.";
       } else {
         Auth.currentUser.error = "Entered e-mail already registered.";
@@ -153,6 +150,7 @@ angular.module('ubiker', [
     if (confirm("Make this your current requested spot?")) {
       $scope.currentSlotRequested = slot;
       SlotRequests.save({id: slot.id});
+      slot.pending_requests = parseInt(slot.pending_requests) + 1;
       console.log("Updated slot");
     }
   };
