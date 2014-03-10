@@ -118,13 +118,12 @@ angular.module('ubiker', [
 
   $scope.signup = function() {
     User.save($scope.signupInfo, function(response) {
-      $scope.signupInfo = {email : "", password : "", username : ""};
       Auth.currentUser.error = false;
       $scope.login($scope.signupInfo);
+      $scope.signupInfo = {email : "", password : "", username : ""};
     }, function(response) {
       console.log(response);
       if (response.status === 400) {
-        console.log("WHY ARE YOU HERE");
         Auth.currentUser.error = "Please verify your inputs.";
       } else {
         Auth.currentUser.error = "Entered e-mail already registered.";
@@ -133,7 +132,7 @@ angular.module('ubiker', [
   };
 
   $scope.login = function(user) {
-    if (user === undefined) user = $scope.user;
+    if (user === null) user = $scope.user;
     Auth.login(user);
   };
 
@@ -243,6 +242,7 @@ angular.module('ubiker', [
     $window.navigator.geolocation.getCurrentPosition(function(position) {
       $scope.$apply(function() {
         //$scope.userPosition = new google.maps.LatLng($scope.mockLat, $scope.mockLong);
+        console.log(position.coords);
         $scope.userPosition = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
         $scope.myMap.panTo($scope.userPosition);
         if ($scope.userMarker !== undefined) {
