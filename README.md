@@ -24,15 +24,19 @@
 ## API
 
 #### GET /slots/{latitude};{longitutde}(?limit={limit}&radius={radius}&status{status}&placement={placement}
+
 ##### Params
+
 * latitude: Float
 * longitude: Float
+
 ##### Query
+
 * limit: Int
 * radius: Int -> Geometric mile radius of latitude/longitude
 * status: ArrayString -> Status(es) of the parking slots, delimited by a comma. e.g. ACTIVE,INPROGRESS 
 * placement: ArrayString -> Placement(s) of the parking slots, delimited by a comma. e.g. PARKING,SIDEWALK
-i
+
 ##### Return
 * 200 If quer/params valid
 * 400 If query/params not valid
@@ -41,6 +45,7 @@ i
 
 If the user is loggedin, also return:
 { user _ rating, user _ requested
+
 #### GET /login
 ##### Return
 * 200 If user is logged in
