@@ -37,33 +37,53 @@ angular.module('ubiker', [
  * Auth factory holding global Auth information
  */
 .factory('Auth', function(UserSession) {
-  var currentUser = { isLoggedIn : false, user : {}, error: false};
+  var currentUser = { isLoggedIn : false, user : {}, error: false, triggerEvent: false};
+
+  var init = function() {
+    UserSession.get({}, function(response) {
+      currentUser.isLoggedIn = true;
+      currentUser.user = response.user;
+      currentUser.error = false;
+    });
+  };
+  init();
 
   var login = function(user) {
    UserSession.save({email : user.email, password: user.password}, function(response) {
+     user.email = "";
+     user.password = "";
      console.log(response);
       currentUser.isLoggedIn = true;
       currentUser.user = response.user;
       currentUser.error = false;
+      change();
     }, function(response){
       currentUser.isLoggedIn = false;
       currentUser.user = {}; 
       currentUser.error = "Wrong/Invalid email/password combination.";
+      change();
     });
   };
 
   var logout = function() {
     UserSession.delete({}, function() {
       currentUser.isLoggedIn = false;
-      currentUser.user = {},
-      currentUser.error = false 
+      currentUser.user = {};
+      currentUser.error = false;
+      change();
     });
   };  
+
+  var change = function() {
+    console.log("Triggering change");
+    currentUser.triggerEvent = !currentUser.triggerEvent;
+  };
 
   return {
     login : login,
     logout : logout,
-    currentUser : currentUser
+    currentUser : currentUser,
+    change : change
   };
 })
 
@@ -98,6 +118,7 @@ angular.module('ubiker', [
 
   $scope.signup = function() {
     User.save($scope.signupInfo, function(response) {
+      $scope.signupInfo = {email : "", password : "", username : ""};
       Auth.currentUser.error = false;
       $scope.login($scope.signupInfo);
     }, function(response) {
@@ -140,31 +161,41 @@ angular.module('ubiker', [
   $scope.ratedSlots = {};
 
   $scope.$watch(function () {
-    return Auth.currentUser;
+    return Auth.currentUser.triggerEvent;
   }, function (currentUser) {
-    $scope.currentUser = currentUser;
-    console.log($scope.currentUser);
+    console.log("LOGGEDIN");
   });
 
   $scope.requestSlot = function(slot) {
     if (confirm("Make this your current requested spot?")) {
+      if ($scope.currentSlotRequested) {
+        $scope.currentSlotRequested.user_requested = null;
+      }
       $scope.currentSlotRequested = slot;
       SlotRequests.save({id: slot.id});
+      $scope.currentSlotRequested.user_requested = new Date().getTime();
+      console.log($scope.currentSlotRequested);
       slot.pending_requests = parseInt(slot.pending_requests) + 1;
       console.log("Updated slot");
+      Auth.change(true);
     }
   };
   $scope.rateSlot = function(slot, rating) {
     var ratingTotal = parseInt(slot.rating)*parseInt(slot.num_ratings);
+    if (slot.user_rating === parseInt(slot.user_rating)) {
+      ratingTotal = ratingTotal - slot.user_rating;;
+      slot.num_ratings = parseInt(slot.num_ratings)- 1;
+    }
     ratingTotal = isNaN(ratingTotal) ? 0 : ratingTotal;
+
     var newRating =  (ratingTotal + rating)/(parseInt(slot.num_ratings)+1); 
     slot.rating = newRating; 
     slot.num_ratings = parseInt(slot.num_ratings) + 1;
+    slot.user_rating = rating;
+
     Ratings.save({id: slot.id, rating: rating}); 
     $scope.ratedSlots[slot.id] = true;
-  }
-
-  
+  } 
 })
 .controller('UbikerCtrl', function($scope, Slots, $window, Config, Auth) {
   $scope.slots = [];
@@ -185,13 +216,34 @@ angular.module('ubiker', [
 
   $scope.mapOptions = Config.maps;
 
+  /**
+   * Helper function for iterators
+   */
+  $scope.repeat = function(n) { 
+    if (n == 0) return null;
+    return new Array(n);
+  };
+
+  /**
+   * Binding to Auth service variable change
+   */
+  $scope.$watch(function () {
+    return Auth.currentUser.triggerEvent;
+  }, function (currentUser) {
+    console.log("User logged in");
+    $scope.updateMarkers(true);
+  });
+
+  /**
+   * Getting lcoation of user and utilizing that to update the markers
+   */
   $scope.getLocation = function(keepDestination) {
     console.log("Getting lcoation");
     $scope.loading = true;
     $window.navigator.geolocation.getCurrentPosition(function(position) {
       $scope.$apply(function() {
-        $scope.userPosition = new google.maps.LatLng($scope.mockLat, $scope.mockLong);
-        //$scope.userPosition = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+        //$scope.userPosition = new google.maps.LatLng($scope.mockLat, $scope.mockLong);
+        $scope.userPosition = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
         $scope.myMap.panTo($scope.userPosition);
         if ($scope.userMarker !== undefined) {
           $scope.userMarker.setPosition($scope.userPosition);
@@ -203,6 +255,10 @@ angular.module('ubiker', [
       alert(error);
     });
   };
+
+  /**
+   * Updating map markers
+   */
   $scope.updateMarkers = function(keepDestination) {
     for (var i = 1; i < $scope.myMarkers.length; i++) {
       $scope.myMarkers[i].marker.setMap(null);
@@ -224,10 +280,9 @@ angular.module('ubiker', [
         });
   };
 
-  $scope.$watch('zoom', function() {
-    $scope.myMap.setZoom($scope.zoom);
-  });
-
+  /**
+   * Setting destination for route
+   */
   $scope.setDestination = function(obj) {
     console.log("Changing destination");
     $scope.selectedBikeSlot = obj;
@@ -263,8 +318,5 @@ angular.module('ubiker', [
       $scope.myMarkers = [$scope.userMarker, ];
     }
   };
-  $scope.repeat = function(n) { 
-    if (n == 0) return null;
-    return new Array(n);
-  };
+
 });

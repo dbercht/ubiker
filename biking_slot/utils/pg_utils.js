@@ -10,6 +10,7 @@ exports.query = function(res, query, params, callback) {
         done();
 
         if (err) {
+          //console.log(query);
           //console.log(err);
           if (res) {
             res.send(500);
