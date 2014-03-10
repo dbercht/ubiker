@@ -1,12 +1,17 @@
 /* global require: false, exports: false */
 var pgUtil = require('../utils/pg_utils.js'),
+    bcrypt = require('bcrypt-nodejs'),
     Request = require('./requests.js');
+
+var hashPassword = function(password) { 
+  return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
+};
 
 /**
  * Function to create a user
  */
 exports.create = function(req, res) {
-  var params =  [ req.body.username, req.body.email, req.body.password ];
+  var params =  [ req.body.username, req.body.email, hashPassword(req.body.password) ];
   for (var i = 0; i < params.length; i++) {
     if (params[i] === undefined) { return res.send(400); }
   }
@@ -63,3 +68,5 @@ var findByCol = function(column, value, done) {
         }
       });
 };
+
+exports.hashPassword = hashPassword;

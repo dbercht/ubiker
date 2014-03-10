@@ -2,6 +2,7 @@
 var pgUtil = require('../utils/pg_utils.js');
 var passport = require('passport'),
     LocalStrategy = require('passport-local').Strategy,
+    bcrypt = require('bcrypt-nodejs'),
     users = require('./users.js');
 
 /**
@@ -14,7 +15,8 @@ passport.use(new LocalStrategy(
     process.nextTick(function () {
       users.findByEmail(email, function(err, user) {
         if (err) { return done(err); }
-        if (!user || user.password != password) { return done(null, false, {}); }
+
+        if (!user || !bcrypt.compareSync(password, user.password) ) { return done(null, false, {}); }
         delete user.password;
         return done(null, user);
       });

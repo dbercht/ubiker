@@ -1,6 +1,7 @@
 /* global exports: false, require: false  */
 var request = require('supertest');
 var pgUtils = require('../utils/pg_utils.js');
+var User = require('../models/users.js');
 
 /**
  * Instantiating a user object
@@ -73,7 +74,7 @@ exports.createTestUser = function(id, done){
   if (id === undefined) id = 0;
   pgUtils.query(null,
       'INSERT INTO users (username, email, password, id) values( $1, $2, $3, $4)',
-      [users[id].username, users[id].email, users[id].password, users[id].id],
+      [users[id].username, users[id].email, User.hashPassword(users[id].password), users[id].id],
       function() {
         done();
       });
