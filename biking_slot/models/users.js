@@ -1,5 +1,6 @@
 /* global require: false, exports: false */
-var pgUtil = require('../utils/pg_utils.js');
+var pgUtil = require('../utils/pg_utils.js'),
+    Request = require('./requests.js');
 
 /**
  * Function to create a user
@@ -44,7 +45,9 @@ var findByCol = function(column, value, done) {
   //Don't forget to unset the password field!!!!
   var query = "SELECT * " +
     "FROM users " +
+    "LEFT OUTER JOIN request on request.user_id = users.id " +
     "WHERE "+column+"= $1 " +
+    "AND " + Request.slotValidInterval() + " " + 
     "LIMIT 1";
   pgUtil.query (null,
       query,

@@ -8,6 +8,7 @@ exports.query = function(res, query, params, callback) {
     }
     client.query (query,  params, function(err, result) {
         done();
+
         if (err) {
           //console.log(err);
           if (res) {

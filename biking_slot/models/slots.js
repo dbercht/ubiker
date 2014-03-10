@@ -70,13 +70,16 @@ var buildAllQuery = function(req) {
       "s.name as status, " +
       "sqrt((ps.latitude - $1)^2+(ps.longitude - $2)^2) as distance, " +
       "AVG(average_rating.val) as rating, " +
-      "COUNT(req) as pending_requests " +
+      "COUNT(average_rating) as num_ratings, " +
+      "COUNT(req) as pending_requests, " +
+      "COUNT(total_requests) as total_requests " +
 
     "FROM parking_slot ps " +
     "LEFT JOIN status s ON s.id = ps.status_id " +
     "LEFT JOIN placement p ON p.id = ps.placement_id " +
     "LEFT JOIN rating average_rating ON average_rating.parking_slot_id = ps.id " +
     "LEFT JOIN request req ON req.parking_slot_id = ps.id " +
+    "LEFT JOIN request total_requests ON total_requests.parking_slot_id = ps.id " +
     "WHERE ps.latitude > $1 - $3 AND ps.latitude < $1 + $3 AND ps.longitude < $2 + $3 AND ps.longitude > $2 - $3 " +
     "AND " + requests.slotValidInterval("req") + " " +
     pgUtil.buildInClause('status', req, 'query', params, 's.name', true) +    

@@ -12,9 +12,11 @@
     -->
   </head>
   <body ng-controller="UbikerCtrl">
-    <div id="header">
-      <span ng-if="isLoggedIn" class="user">Welcome, User</span>
-      <button  ng-if="!isLoggedIn"  class="user btn btn-primary btn-md btn-block" data-toggle="modal" data-target="#logInModal">Log In</button>
+    <div id="header" ng-controller="AuthCtrl">
+      <span ng-if="currentUser.isLoggedIn" class="user">
+        <button ng-if="currentUser.isLoggedIn"  class="col-sm-4 btn btn-primary btn-md btn-block" ng-click="logout()">Log Out</button>
+      </span>
+      <button  ng-if="!currentUser.isLoggedIn"  class="user btn btn-primary btn-md btn-block" data-toggle="modal" data-target="#logInModal">Log In</button>
       <h2>UB<span class="darker">ik</span>ER</h2>
     </div>
     <div class="clearfix"></div>
@@ -22,7 +24,7 @@
     <div id="controls">
       <form role="form">
         <div class="form-group">
-          <label for="Slot Type">Placement Types</label>
+          <label for="Slot Type">Parking Type</label>
           <select multiple class="form-control" ng-model="search.placement" placeholder="Slot Type">
             <option value="PARCEL">Parcel</option>
             <option value="SIDEWALK">Sidewalk</option>
@@ -50,15 +52,15 @@
           <h5 class="list-group-item-heading">
             {{ marker['slot'].location }}
           </h5>
-          <span class="badge">{{marker['slot'].spaces}}</span>
-          <!--<p class="list-group-item-text">{{ marker['slot'].distance | number:2 }} mi away </p>-->
-          <p class="list-group-item-text">{{ marker['slot'].racks }} racks</p>
-          <p class="list-group-item-text">Placement type: {{ marker['slot'].placement }}</p>
-          <p class="list-group-item-text">Status: <span class="glyphicon glyphicon-{{ marker['slot'].status === 'COMPLETE' ? 'ok' : 'warning-sign' }}"></span></p>
-          <p class="list-group-item-text" ng-if="marker['slot'].stars > 0 "><span ng-repeat="star in repeat(marker['slot'].rating) track by $index" class="glyphicon glyphicon-star"></span></p>
-          <button  class="btn btn-primary btn-md btn-block" data-toggle="modal" data-target="#myModal">
-          Reserve a slot 
-        </button>
+          <p class="list-group-item-text">Status: <span class="glyphicon glyphicon-{{ marker['slot'].status === 'COMPLETE' ? 'ok' : 'warning-sign' }}"></span>
+          <span>
+          </span>
+          <button  class="btn btn-primary btn-md" data-toggle="modal" data-target="#myModal">
+            Reserve a slot
+          </button>
+          </p>
+          <p class="list-group-item-text" ng-if="marker['slot'].stars > 0 "><span ng-repeat="star in repeat(marker['slot'].rating) track by $index" class="glyphicon glyphicon-star"></span>
+          </p>
         </a>
       </div>
     </div>
@@ -74,17 +76,20 @@
 
     <!-- Modal -->
     <div class="modal fade" ng-controller="UserCtrl"id="logInModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
+      <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
             <h4 class="modal-title" id="myModalLabel">Log In</h4>
           </div>
-          <div class="modal-body">
-            <div ng-if="badLogin === false">
-              Wrong or inexisting username/combo, try again.
+          <div class="modal-body" ng-if="currentUser.isLoggedIn">
+                    <button type="button" class="btn btn-default btn-lg col-lg-8 col-lg-offset-2" data-dismiss="modal">Let's find parking!</button>
+          </div>
+          <div class="modal-body" ng-if="!currentUser.isLoggedIn">
+            <div class="alert alert-danger" ng-if="currentUser.error !== false">
+              {{currentUser.error}}
             </div>
-            <form role="form" class="col-sm-6 well">
+            <form role="form" class="col-sm-5 well">
               <h3 class="text-center">Login/Sign Up</h3>
               <div class="form-group">
                 <label for="email">Email address</label>
@@ -96,21 +101,21 @@
               </div>
               <button type="button" class="btn btn-primary" ng-click="login()">Log In</button>
             </form> 
-            <form role="form" class="col-sm-6 well">
+            <form role="form" class="col-sm-5 col-sm-offset-2 well">
             <h3 class="text-center">Sign Up</h3>
               <div class="form-group">
                 <label for="username">Username</label>
-                <input type="text" class="form-control" id="username" placeholder="Username">
+                <input type="text" class="form-control" id="username" placeholder="Username" ng-model="signupInfo.username">
               </div>
               <div class="form-group">
                 <label for="email">Email address</label>
-                <input type="email" class="form-control" id="email" placeholder="Email">
+                <input type="email" class="form-control" id="email" placeholder="Email" ng-model="signupInfo.email">
               </div>
               <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" class="form-control" id="password" placeholder="Password">
+                <input type="password" class="form-control" id="password" placeholder="Password" ng-model="signupInfo.password">
               </div>
-              <button type="button" class="btn btn-primary">Sign Up</button>
+              <button type="button" class="btn btn-primary" ng-click="signup()">Sign Up</button>
             </form> 
           </div>
           <div class="modal-footer">
@@ -119,20 +124,87 @@
       </div>
     </div>
 
-    <!-- Modal -->
-    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <!-- MODAL for currently selected parking slot -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" ng-controller="SlotCtrl">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+            <h4 class="modal-title" id="myModalLabel">{{ selectedBikeSlot['slot'].location }}</h4>
           </div>
-          <div class="modal-body">
-            ...
+          <div class="modal-body text-center">
+            <h4 class="text-center" ng-if="currentSlotRequested==selectedBikeSlot['slot']">You've just requested this slot</h4>
+            <button ng-if="currentUser.isLoggedIn&&(currentSlotRequested!=selectedBikeSlot['slot'])" class="btn btn-lg btn-block btn-success" ng-click="requestSlot(selectedBikeSlot['slot'])">Request a slot!</button>
+            <button ng-if="!currentUser.isLoggedIn" class="btn btn-lg btn-block btn-warning" data-toggle="modal" data-target="#logInModal" data-dismiss="modal">Login or signup to request a parking slot</button>
+            <div class="row text-center">
+              <div class="col-sm-6">
+                # of current parking requests
+                <h4>{{ selectedBikeSlot['slot'].pending_requests }}</h4>
+              </div>
+
+              <div class="col-sm-6"> 
+                Likelihood to find a spot: 
+                <div class="alert alert-success" ng-if="selectedBikeSlot['slot'].pending_requests == 0">Great!</div>
+                <div class="alert alert-warning" ng-if="selectedBikeSlot['slot'].pending_requests > 0 && selectedBikeSlot['slot'].pending_requests < 5">OK</div>
+                <div class="alert alert-danger" ng-if="selectedBikeSlot['slot'].pending_requests > 8">At your own risk</div>
+              </div>
+            </div>
+            <div class="list-group">
+              <a class="list-group-item">
+                <h4 class="list-group-item-heading">
+                  Parking Slot Type
+                </h4>
+                <p class="list-group-item-text">
+                  {{ selectedBikeSlot['slot'].placement }}
+                </p>
+              </a>
+              <a class="list-group-item">
+                <h4 class="list-group-item-heading">
+                  Registered Spaces
+                </h4>
+                <p class="list-group-item-text">
+                  {{ selectedBikeSlot['slot'].racks }} Racks
+                </p>
+                <p class="list-group-item-text">
+                  {{ selectedBikeSlot['slot'].racks }} Spaces
+                </p>
+              </a>
+              <a class="list-group-item">
+                <h4 class="list-group-item-heading">
+                  Total number of parking requests made to today
+                </h4>
+                <p class="list-group-item-text">
+                  {{ selectedBikeSlot['slot'].total_requests }}
+                </p>
+              </a>
+              <a class="list-group-item">
+                <h4 class="list-group-item-heading">
+                  Average Rating
+                </h4>
+                <p class="list-group-item-text" ng-if="selectedBikeSlot['slot'].num_ratings > 0">
+                    {{ selectedBikeSlot['slot'].rating | number : 2}} average rating <br />
+                    {{ selectedBikeSlot['slot'].num_ratings }} total ratings
+                </p>
+                <p class="list-group-item-text" ng-if="selectedBikeSlot['slot'].num_ratings == 0">
+                    No ratings yet
+                </p>
+                <button ng-if="!currentUser.isLoggedIn" class="btn btn-lg btn-block btn-warning" data-toggle="modal" data-target="#logInModal" data-dismiss="modal">Login or signup to rate!</button>
+
+                <div ng-if="currentUser.isLoggedIn&&(ratedSlots[selectedBikeSlot['slot'].id]!==true)" class="btn-group">
+                  <button type="button" class"btn btn-default"  ng-click="rateSlot(selectedBikeSlot['slot'], 0)">0 (Bad)</button>
+                  <button type="button" class"btn btn-default"  ng-click="rateSlot(selectedBikeSlot['slot'], 1)">1</button>
+                  <button type="button" class"btn btn-default"  ng-click="rateSlot(selectedBikeSlot['slot'], 2)">2</button>
+                  <button type="button" class"btn btn-default"  ng-click="rateSlot(selectedBikeSlot['slot'], 3)">3</button>
+                  <button type="button" class"btn btn-default"  ng-click="rateSlot(selectedBikeSlot['slot'], 4)">4</button>
+                  <button type="button" class"btn btn-default"  ng-click="rateSlot(selectedBikeSlot['slot'], 5)">5 (Great)</button>
+                </div>
+              </a>
+              {{ ratedSlots }}
+              {{ currentSlotRequested }}
+            </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Save changes</button>
           </div>
         </div>
       </div>

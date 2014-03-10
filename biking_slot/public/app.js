@@ -4,9 +4,25 @@ angular.module('ubiker', [
     'ui.event',
     'ngResource'
     ])
+
+/**
+ * Slots service
+ */
 .service('Slots', function($resource) {
   return $resource('/slots/:latitude;:longitude', {latitude:'@latitude', longitude: '@longitude'});
 })
+
+.service('SlotRequests', function($resource) {
+  return $resource('/slots/:id/requests', {id:'@id'});
+})
+
+.service('Ratings', function($resource) {
+  return $resource('/slots/:id/ratings', {id: '@id'});
+})
+
+/**
+ * Config service for maps
+ */
 .service('Config', function() {
   var maps = {
     //zoomControl: false,
@@ -16,54 +32,143 @@ angular.module('ubiker', [
     mapTypeId: google.maps.MapTypeId.RODMAP
   };
 })
-.service('User', function($http) {
-  var loggedIn = false;
-  var user = {};
+
+/**
+ * Auth factory holding global Auth information
+ */
+.factory('Auth', function(UserSession) {
+  var currentUser = { isLoggedIn : false, user : {}, error: false};
+
+  var login = function(user) {
+   UserSession.save({email : user.email, password: user.password}, function(response) {
+     console.log(response);
+      currentUser.isLoggedIn = true;
+      currentUser.user = response.user;
+      currentUser.error = false;
+    }, function(response){
+      currentUser.isLoggedIn = false;
+      currentUser.user = {}; 
+      currentUser.error = "Wrong/Invalid email/password combination.";
+    });
+  };
+
+  var logout = function() {
+    UserSession.delete({}, function() {
+      currentUser.isLoggedIn = false;
+      currentUser.user = {},
+      currentUser.error = false 
+    });
+  };  
+
   return {
-    isLoggedIn : function() {
-                    $http({method : 'GET', url : '/login'}).
-                      success(function(data, status, headers, config){
-                        loggedIn = true;
-                        user = data.user;
-                      }).
-                      error(function(data, status, headers, config) {
-                        loggedIn = false;
-                        user = {};
-                      });
-                   return loggedIn;
-                 },
-    login : function(email, password) {
-                    $http({method : 'POST', url : '/login', data: { email : email, password : password}}).
-                      success(function(data, status, headers, config){
-                        loggedIn = true;
-                        user = data.user;
-                        return {
-                          user : user,
-                          isLoggedIn : true,
-                          errors : false
-                        };
-                      }).
-                      error(function(data, status, headers, config) {
-                        return {
-                          user : {},
-                          isLoggedIn : false,
-                          error: "Bad or inexisting combination"
-                        };
-                      });
-                   return loggedIn;
-                 }
-    };
+    login : login,
+    logout : logout,
+    currentUser : currentUser
+  };
 })
-.controller('UserCtrl', function($scope, User) {
-  $scope.isLoggedIn = User.isLoggedIn();
+
+/**
+ * User service for login/logout 
+ */
+.service('UserSession', function($resource) {
+  return $resource('/login');
+})
+
+/**
+ * User service for login/logout 
+ */
+.service('User', function($resource) {
+  return $resource('/users');
+})
+
+/**
+ * Controllers for logging in and signing up
+ */
+.controller('UserCtrl', function($scope, User, UserSession, Auth) {
   $scope.user = {email: "", password : ""};
-  $scope.login = function() {
-    console.log("Logging in");
-    $scope.badLogin = User.login($scope.user.email, $scope.user.password);
-  }
-  console.log(User.user);
+  $scope.currentUser = Auth.currentUser;
+  $scope.signupInfo = {email : "", password : "", username : "" };
+
+  $scope.$watch(function () {
+    return Auth.currentUser;
+  }, function (currentUser) {
+    $scope.currentUser = currentUser;
+    console.log($scope.currentUser);
+  });
+
+  $scope.signup = function() {
+    User.save($scope.signupInfo, function(response) {
+      if (response.status < 300) {
+        $scope.login($scope.signupInfo);
+      } else {
+        Auth.currentUser.error = "Please verify your inputs.";
+      }
+
+    }, function(response) {
+      console.log(response);
+      if (response.status === 400) {
+        Auth.currentUser.error = "Please verify your inputs.";
+      } else {
+        Auth.currentUser.error = "Entered e-mail already registered.";
+      }
+    });
+  };
+
+  $scope.login = function(user) {
+    if (user === undefined) user = $scope.user;
+    Auth.login(user);
+  };
+
 })
-.controller('UbikerCtrl', function($scope, Slots, $window, Config) {
+
+.controller('AuthCtrl', function($scope, Auth) {
+  $scope.currentUser = Auth.currentUser;
+
+  $scope.$watch(function () {
+    return Auth.currentUser;
+  }, function (currentUser) {
+    $scope.currentUser = currentUser;
+    console.log($scope.currentUser);
+  });
+
+  $scope.logout = function() {
+    Auth.logout();
+  };
+  
+})
+
+.controller('SlotCtrl', function($scope, Auth, SlotRequests, Ratings) {
+  $scope.currentUser = Auth.currentUser;
+  $scope.currentSlotRequested;
+  $scope.ratedSlots = {};
+
+  $scope.$watch(function () {
+    return Auth.currentUser;
+  }, function (currentUser) {
+    $scope.currentUser = currentUser;
+    console.log($scope.currentUser);
+  });
+
+  $scope.requestSlot = function(slot) {
+    if (confirm("Make this your current requested spot?")) {
+      $scope.currentSlotRequested = slot;
+      SlotRequests.save({id: slot.id});
+      console.log("Updated slot");
+    }
+  };
+  $scope.rateSlot = function(slot, rating) {
+    var ratingTotal = parseInt(slot.rating)*parseInt(slot.num_ratings);
+    ratingTotal = isNaN(ratingTotal) ? 0 : ratingTotal;
+    var newRating =  (ratingTotal + rating)/(parseInt(slot.num_ratings)+1); 
+    slot.rating = newRating; 
+    slot.num_ratings = parseInt(slot.num_ratings) + 1;
+    Ratings.save({id: slot.id, rating: rating}); 
+    $scope.ratedSlots[slot.id] = true;
+  }
+
+  
+})
+.controller('UbikerCtrl', function($scope, Slots, $window, Config, Auth) {
   $scope.slots = [];
   $scope.search = {placement :[]};
   $scope.loading = false;
