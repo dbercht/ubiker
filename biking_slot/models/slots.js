@@ -1,8 +1,8 @@
 /* global require: false, exports: false */
-var pgUtil = require('../utils/pg_utils.js');
-var inputSanitizer = require('../utils/sanitizer.js');
-var converter = require('../utils/converter.js');
-var requests = require('./requests.js');
+var pgUtil = require('../utils/pg_utils.js'),
+  inputSanitizer = require('../utils/sanitizer.js'),
+  converter = require('../utils/converter.js'),
+  requests = require('./requests.js');
 
 //Default radius in miles
 var DEFAULT_RADIUS = 10;

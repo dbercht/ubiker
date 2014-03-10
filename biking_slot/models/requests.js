@@ -17,6 +17,7 @@ var slotValidInterval = function(alias) {
 
   return "coalesce( " + alias + "date_requested, NOW()) + interval '" + exports.CURRENT_INTERVAL_HOURS + " hours' > NOW()";
 };
+
 /**
  * Method for authenticated users to request a slot
  * Restriction: A user must only have one active request in the span on 24 hours
@@ -42,6 +43,7 @@ exports.create = function(req, res) {
     "request ( user_id, parking_slot_id ) " +
     "values ( $1, $2 )";
 
+  //delete request within the current interval, create new one
   pgUtil.query(res,
       deleteQuery,
       params.slice(0,1),
@@ -54,6 +56,9 @@ exports.create = function(req, res) {
           });
       });
 };
+/**
+ * Function to verify if a  user's current request is for a given slot 
+ */
 exports.getRequest = function(user_id, slot_id, done) {
   var query = 'SELECT * ' + 
     'FROM request ' + 

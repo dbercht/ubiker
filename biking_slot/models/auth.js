@@ -49,10 +49,16 @@ exports.ensureAuthenticated = function(req, res, next) {
   res.send(401);
 };
 
+/**
+ * Route to logout
+ */
 exports.logout =  function(req, res) {
   req.logout();
   res.send(200);
 };
+/**
+ * Current session information (if user is already logged in)
+ */
 exports.login =  function(req, res) {
   res.send({ user : req.user });
 };

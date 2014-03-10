@@ -159,12 +159,6 @@ angular.module('ubiker', [
   $scope.currentSlotRequested;
   $scope.ratedSlots = {};
 
-  $scope.$watch(function () {
-    return Auth.currentUser.triggerEvent;
-  }, function (currentUser) {
-    console.log("LOGGEDIN");
-  });
-
   $scope.requestSlot = function(slot) {
     if (confirm("Make this your current requested spot?")) {
       if ($scope.currentSlotRequested) {
@@ -229,7 +223,6 @@ angular.module('ubiker', [
   $scope.$watch(function () {
     return Auth.currentUser.triggerEvent;
   }, function (currentUser) {
-    console.log("User logged in");
     $scope.updateMarkers(true);
   });
 

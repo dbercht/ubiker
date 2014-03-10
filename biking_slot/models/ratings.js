@@ -14,23 +14,28 @@ exports.create = function(req, res) {
   if (errors) {
     return res.send(400, errors);
   }
+
   var params = [
     req.user.id,
     req.params.slot_id,
     req.body.rating
     ];
+  //Catcing required params red flag
   for (var i  = 0; i< params.length; i++) {
     if (params[i] === undefined) return res.send(400, {message : { "Expected" : "rating" } } );
   }
 
+  //Query for deletion
   var deleteQuery = "DELETE FROM rating " + 
     "WHERE user_id = $1 " +  
     "AND parking_slot_id = $2;";
+  //Query for creation
   var createQuery = 
     "INSERT INTO " +
     "rating ( user_id, parking_slot_id, val ) " +
     "values ( $1, $2, $3 )";
 
+  //Delete exisitng rating, create new one
   pgUtil.query(res,
       deleteQuery,
       params.slice(0,2),
@@ -44,6 +49,9 @@ exports.create = function(req, res) {
       });
 };
 
+/**
+ * Get a rating for a current user and a parking slot
+ */
 exports.getRating = function(user_id, slot_id, done) {
   var query = 'SELECT * from rating WHERE user_id = $1 AND parking_slot_id = $2';
   pgUtil.query(null,

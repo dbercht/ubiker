@@ -3,6 +3,9 @@ var pgUtil = require('../utils/pg_utils.js'),
     bcrypt = require('bcrypt-nodejs'),
     Request = require('./requests.js');
 
+/**
+ * Hashin a user password
+ */
 var hashPassword = function(password) { 
   return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
 };
