@@ -1,6 +1,7 @@
 # UBikER
 
   Bicycle parking finder for you, U BikER!
+  Visit me at [UBikER](http://ubiker.danielbercht.com)
 
 ## About
 
@@ -49,7 +50,7 @@
 
 ### Auth: Passport
 
-  Utilized (passport-local)[https://github.com/jaredhanson/passport-local] for the authentication. It's a node middleware that simplifies authenticating users. It would have been easy to implement 
+  Utilized [passport-local](https://github.com/jaredhanson/passport-local) for the authentication. It's a node middleware that simplifies authenticating users. It would have been easy to implement 
 
 ## Features I wanted to add
 
