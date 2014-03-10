@@ -21,80 +21,6 @@
 * On Sunny days and during cycling events in a city, there are ***'surge parking slot'*** status making cyclists pay for slots to keep the market with enough slots for everyone (just kidding).
 * Users can select what type of parking spot to choose (Sidewalk, Garage, Racks, Parcel)
 
-## API
-
-#### GET /slots/{latitude};{longitutde}(?limit={limit}&radius={radius}&status{status}&placement={placement}
-
-##### Params
-
-* latitude: Float
-* longitude: Float
-
-##### Query
-
-* limit: Int
-* radius: Int -> Geometric mile radius of latitude/longitude
-* status: ArrayString -> Status(es) of the parking slots, delimited by a comma. e.g. ACTIVE,INPROGRESS 
-* placement: ArrayString -> Placement(s) of the parking slots, delimited by a comma. e.g. PARKING,SIDEWALK
-
-##### Return
-* 200 If quer/params valid
-* 400 If query/params not valid
-
-{ id, location, address, spaces, racks, latitude, longitude, placement, status, distance, rating, num _ ratings, pending _ requests, total _ requests }
-
-If the user is loggedin, also return:
-{ user _ rating, user _ requested
-
-#### GET /login
-##### Return
-* 200 If user is logged in
-* 401 If User is not logged in
-
-{ user: { username, email }}
-
-#### POST /login
-##### Body Params
-* email: String
-* password: String
-
-##### Return
-* 400 If bad/nonexisting combination
-* 200 If success (returns GET /login)
-
-#### POST /users
-##### Body Params
-* email : String
-* username : String
-* password : String
-
-##### Return
-* 201 If Created
-* 400 If bad params
-* 500 If email exists (A little hacky)
-
-{}
-
-#### POST /slots/{id}/ratings
-##### Params
-* id: Int
-
-##### Body Params
-* rating :Int [1 - 5]
-
-##### Return
-* 401 If User not authorized
-* 201 If Created
-
-
-#### POST /slots/{id}/requests
-##### Params
-* id: Int
-
-##### Return
-* 401 If User not authorized
-* 201 If Created
-
 ## Tools
 
 ### Backend: Node.js
@@ -162,3 +88,77 @@ If the user is loggedin, also return:
 ### Retrieving slots based on "Geometric distance"
 
   The slots are retrieved based on the current user's Geometric distance, not the actual route's length, which might provide false results at times.
+
+## API
+
+#### GET /slots/{latitude};{longitutde}(?limit={limit}&radius={radius}&status{status}&placement={placement}
+
+##### Params
+
+* latitude: Float
+* longitude: Float
+
+##### Query
+
+* limit: Int
+* radius: Int -> Geometric mile radius of latitude/longitude
+* status: ArrayString -> Status(es) of the parking slots, delimited by a comma. e.g. ACTIVE,INPROGRESS 
+* placement: ArrayString -> Placement(s) of the parking slots, delimited by a comma. e.g. PARKING,SIDEWALK
+
+##### Return
+* 200 If quer/params valid
+* 400 If query/params not valid
+
+{ id, location, address, spaces, racks, latitude, longitude, placement, status, distance, rating, num _ ratings, pending _ requests, total _ requests }
+
+If the user is loggedin, also return:
+{ user _ rating, user _ requested }
+
+#### GET /login
+##### Return
+* 200 If user is logged in
+* 401 If User is not logged in
+
+{ user: { username, email }}
+
+#### POST /login
+##### Body Params
+* email: String
+* password: String
+
+##### Return
+* 400 If bad/nonexisting combination
+* 200 If success (returns GET /login)
+
+#### POST /users
+##### Body Params
+* email : String
+* username : String
+* password : String
+
+##### Return
+* 201 If Created
+* 400 If bad params
+* 500 If email exists (A little hacky)
+
+{}
+
+#### POST /slots/{id}/ratings
+##### Params
+* id: Int
+
+##### Body Params
+* rating :Int [1 - 5]
+
+##### Return
+* 401 If User not authorized
+* 201 If Created
+
+
+#### POST /slots/{id}/requests
+##### Params
+* id: Int
+
+##### Return
+* 401 If User not authorized
+* 201 If Created
